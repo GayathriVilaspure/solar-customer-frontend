@@ -49,7 +49,8 @@ export class DashboardComponent implements OnInit {
     this.filteredVisitors = this.visitors.filter(visitor => 
       visitor.consumerName.toLowerCase().includes(term) ||
       visitor.consumerNumber.toString().includes(term) ||
-      visitor.consumerEmail?.toLowerCase().includes(term)
+      visitor.consumerEmail?.toLowerCase().includes(term)||
+      visitor.installationStatus?.toLowerCase().includes(term)
     );
   }
 

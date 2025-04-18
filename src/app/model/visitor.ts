@@ -1,5 +1,5 @@
 export interface Visitor {
-    id?: number;
+   id:number;
     consumerName: string;
     consumerNumber: string;
     consumerEmail: string;

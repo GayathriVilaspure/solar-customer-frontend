@@ -11,10 +11,9 @@ import { VisitorService } from 'src/app/services/visitor.service';
 })
 export class VisitorFormComponent implements OnInit {
   visitorForm!: FormGroup;
-  isEditMode = false;
   visitorId!: number;
   loading = false;
-
+  isEditMode = false; 
   constructor(
     private fb: FormBuilder,
     private visitorService: VisitorService,
@@ -24,7 +23,7 @@ export class VisitorFormComponent implements OnInit {
 
   ngOnInit(): void {
     this.initForm();
-    this.checkEditMode();
+    this.loadVisitorIfPresent();
   }
 
   private initForm(): void {
@@ -36,28 +35,22 @@ export class VisitorFormComponent implements OnInit {
     });
   }
 
-  private checkEditMode(): void {
+  private loadVisitorIfPresent(): void {
     this.route.paramMap.subscribe(params => {
       const id = params.get('id');
       if (id) {
         this.isEditMode = true;
         this.visitorId = +id;
-        this.loadVisitor(this.visitorId);
-      }
-    });
-  }
 
-  private loadVisitor(id: number): void {
-    this.loading = true;
-    this.visitorService.getVisitorById(id).subscribe({
-      next: (visitor: Visitor) => {
-        this.visitorForm.patchValue(visitor);
-        this.loading = false;
-      },
-      error: (error: any) => {
-        console.error('Error loading visitor:', error);
-        this.loading = false;
-        alert('Failed to load visitor data');
+        this.visitorService.getVisitorById(this.visitorId).subscribe({
+          next: (visitor: Visitor) => {
+            this.visitorForm.patchValue(visitor);
+          },
+          error: (error: any) => {
+            console.error('Error loading visitor:', error);
+            alert('Failed to load visitor data');
+          }
+        });
       }
     });
   }
@@ -69,32 +62,20 @@ export class VisitorFormComponent implements OnInit {
     }
 
     this.loading = true;
-    const formData = this.visitorForm.value;
-
-    // Ensure we have a valid ID in edit mode
-    if (this.isEditMode && (isNaN(this.visitorId) || this.visitorId <= 0)) {
-      alert('Invalid customer ID');
-      this.loading = false;
-      return;
-    }
 
     const visitor: Visitor = {
-      ...formData,
-      ...(this.isEditMode && { id: this.visitorId })
+      ...this.visitorForm.value
+      // ID not included on purpose to force creation
     };
 
-    const operation = this.isEditMode 
-      ? this.visitorService.updateVisitor(visitor)
-      : this.visitorService.createVisitor(visitor);
-
-    operation.subscribe({
+    this.visitorService.createVisitor(visitor).subscribe({
       next: () => {
-        alert(`Visitor ${this.isEditMode ? 'updated' : 'added'} successfully!`);
+        alert('Visitor installation info submitted successfully!');
         this.router.navigate(['/']);
       },
       error: (error: any) => {
-        console.error(`Error ${this.isEditMode ? 'updating' : 'adding'} visitor:`, error);
-        alert(`Failed to ${this.isEditMode ? 'update' : 'add'} visitor. Please try again.`);
+        console.error('Error submitting visitor info:', error);
+        alert('Failed to submit visitor data. Please try again.');
         this.loading = false;
       },
       complete: () => {
