@@ -1,0 +1,64 @@
+<div class="container">
+  <h3>{{ isEditMode ? 'Edit Solar Installation' : 'New Solar Installation' }}</h3>
+  <form [formGroup]="visitorForm" (ngSubmit)="onSubmit()" autocomplete="off">
+
+    <div class="form-group floating-label">
+      <input id="consumerName" type="text" formControlName="consumerName" class="form-control" 
+             placeholder=" " required>
+      <label for="consumerName">Customer Name</label>
+      <div class="error-message" *ngIf="visitorForm.get('consumerName')?.touched && 
+            visitorForm.get('consumerName')?.invalid">
+        Customer name is required
+      </div>
+    </div>
+
+    <div class="form-group floating-label">
+      <input id="consumerNumber" type="text" formControlName="consumerNumber" class="form-control" 
+             placeholder=" " required>
+      <label for="consumerNumber">Consumer Number</label>
+      <div class="error-message" *ngIf="visitorForm.get('consumerNumber')?.touched && 
+            visitorForm.get('consumerNumber')?.invalid">
+        <span *ngIf="visitorForm.get('consumerNumber')?.errors?.['required']">
+          Account number is required
+        </span>
+        <span *ngIf="visitorForm.get('consumerNumber')?.errors?.['pattern']">
+          Only numbers are allowed
+        </span>
+      </div>
+    </div>
+
+    <div class="form-group floating-label">
+      <input id="consumerEmail" type="email" formControlName="consumerEmail" class="form-control" 
+             placeholder=" " required>
+      <label for="consumerEmail">Email Address</label>
+      <div class="error-message" *ngIf="visitorForm.get('consumerEmail')?.touched && 
+            visitorForm.get('consumerEmail')?.invalid">
+        <span *ngIf="visitorForm.get('consumerEmail')?.errors?.['required']">
+          Email is required
+        </span>
+        <span *ngIf="visitorForm.get('consumerEmail')?.errors?.['email']">
+          Please enter a valid email
+        </span>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="installationStatus">Installation Status</label>
+      <select id="installationStatus" formControlName="installationStatus" class="form-control" required>
+        <option value="">Select status...</option>
+        <option value="Pending">Pending</option>
+        <option value="In Progress">In Progress</option>
+        <option value="Completed">Completed</option>
+      </select>
+      <div class="error-message" *ngIf="visitorForm.get('installationStatus')?.touched && 
+            visitorForm.get('installationStatus')?.invalid">
+        Please select a status
+      </div>
+    </div>
+
+    <button type="submit" [disabled]="visitorForm.invalid || loading">
+      <span *ngIf="!loading">{{ isEditMode ? 'Update Installation' : 'Add Installation' }}</span>
+      <span *ngIf="loading">Processing...</span>
+    </button>
+  </form>
+</div>
